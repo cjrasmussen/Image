@@ -1,0 +1,30 @@
+{
+  "name": "cjrasmussen/image",
+  "description": "Simple functions for image manipulation",
+  "version": "1.0.0",
+  "keywords": ["gd", "images"],
+  "homepage": "https://www.clarkrasmussen.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Clark Rasmussen",
+      "homepage": "https://www.clarkrasmussen.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/cjrasmussen/Image/issues",
+    "source": "https://github.com/cjrasmussen/Image"
+  },
+  "require": {
+    "php": ">=7.1.0",
+    "ext-ctype": "*",
+    "ext-gd": "*",
+    "cjrasmussen/color": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "cjrasmussen\\Image\\": "src/"
+    }
+  }
+}
