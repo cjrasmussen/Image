@@ -27,4 +27,4 @@ Although it's recommended to use Composer, you can actually include the file(s) 
 
 ## License
 
-Color is [MIT](http://opensource.org/licenses/MIT) licensed.
+Image is [MIT](http://opensource.org/licenses/MIT) licensed.
