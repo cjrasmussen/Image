@@ -85,6 +85,58 @@ class Text
 	}
 
 	/**
+	 * Add a block of text to an image resource, with the text horizontally condensed to a given percentage of the standard font size
+	 *
+	 * @param $img
+	 * @param string $text
+	 * @param string $font
+	 * @param int $size
+	 * @param resource|string $color
+	 * @param int $condensed
+	 * @param int $x
+	 * @param int $y
+	 * @param int $alignment_horizontal
+	 * @param int $alignment_vertical
+	 * @return void
+	 */
+	public static function writeCondensed(
+		&$img,
+		$text,
+		$font,
+		$size,
+		$color,
+		$condensed,
+		$x,
+		$y,
+		$alignment_horizontal = self::HorizontalAlignLeft,
+		$alignment_vertical = self::VerticalAlignTop
+	): void
+	{
+		$box_size = Text::getBoxSize($text, $font, $size);
+		$tmp_w = $box_size['width'] + 2;
+		$tmp_h = $box_size['height'] + 2;
+
+		$tmp = Create::transparent($tmp_w, $tmp_h);
+
+		Text::write($tmp, $text, $font, $size, $color, 1, 1);
+
+		$dst_w = (int)floor($tmp_w * ($condensed / 100));
+
+		$x = self::determineAlignmentPositionHorizontal($x, $dst_w, $alignment_horizontal) - 1;
+
+		if ($alignment_vertical !== self::VerticalAlignTop) {
+			$y = self::determineAlignmentPositionVertical($y, $box_size['height'], $box_size['baseline'], $alignment_vertical);
+			$y -= $box_size['baseline'];
+		}
+
+		$y--;
+
+		imagecopyresampled($img, $tmp, $x, $y, 0, 0, $dst_w, $tmp_h, $tmp_w, $tmp_h);
+
+		imagedestroy($tmp);
+	}
+
+	/**
 	 * Return the size of the box required for the given text
 	 *
 	 * @param string $text
