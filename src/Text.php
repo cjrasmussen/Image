@@ -64,7 +64,7 @@ class Text
 		do {
 			$size--;
 			$box_size = self::getBoxSize($text, $font, $size);
-			$stroke = round($stroke_original * ($size / $size_original));
+			$stroke = (int)round($stroke_original * ($size / $size_original));
 			$actual_width = $box_size['width'] + ($stroke * 2);
 		} while (($max_width !== null) AND ($actual_width > $max_width));
 
@@ -181,8 +181,8 @@ class Text
 	 * @param int $angle
 	 * @param int $x
 	 * @param int $y
-	 * @param resource $textcolor
-	 * @param resource $strokecolor
+	 * @param resource|int $textcolor
+	 * @param resource|int $strokecolor
 	 * @param string $fontfile
 	 * @param string $text
 	 * @param int $px
@@ -208,8 +208,8 @@ class Text
 	 * @param int $angle
 	 * @param int $x
 	 * @param int $y
-	 * @param resource $textcolor
-	 * @param resource $strokecolor
+	 * @param resource|int $textcolor
+	 * @param resource|int $strokecolor
 	 * @param string $fontfile
 	 * @param string $text
 	 * @param int $px
