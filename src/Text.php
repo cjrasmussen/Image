@@ -44,7 +44,8 @@ class Text
 		$max_width = null,
 		$stroke = 0,
 		$strokeColor = null
-	): void {
+	): void
+	{
 		if (General::isHexColor($color)) {
 			$rgb = Convert::hexToRgb($color);
 			$color = imagecolorallocate($img, $rgb->R, $rgb->G, $rgb->B);
@@ -67,19 +68,8 @@ class Text
 			$actual_width = $box_size['width'] + ($stroke * 2);
 		} while (($max_width !== null) AND ($actual_width > $max_width));
 
-		if ($alignment_horizontal === self::HorizontalAlignCenter) {
-			$x -= round($box_size['width'] / 2);
-		} elseif ($alignment_horizontal === self::HorizontalAlignRight) {
-			$x -= $box_size['width'];
-		}
-
-		if ($alignment_vertical === self::VerticalAlignMiddle) {
-			$y += round($box_size['baseline'] / 2);
-		} elseif ($alignment_vertical === self::VerticalAlignTop) {
-			$y += $box_size['baseline'];
-		} else {
-			$y -= $box_size['height'] - $box_size['baseline'];
-		}
+		$x = self::determineAlignmentPositionHorizontal($x, $box_size['width'], $alignment_horizontal);
+		$y = self::determineAlignmentPositionVertical($y, $box_size['height'], $box_size['baseline'], $alignment_vertical);
 
 		if (($stroke) AND ($strokeColor)) {
 			if ($font_type === 'ttf') {
@@ -183,5 +173,46 @@ class Text
 		}
 
 		imagefttext($image, $size, $angle, $x, $y, $textcolor, $fontfile, $text);
+	}
+
+	/**
+	 * Determine the actual X coordinate for text based on the alignment
+	 *
+	 * @param int $x
+	 * @param int $width
+	 * @param int $alignment
+	 * @return int
+	 */
+	private static function determineAlignmentPositionHorizontal($x, $width, $alignment): int
+	{
+		if ($alignment === self::HorizontalAlignCenter) {
+			$x -= round($width / 2);
+		} elseif ($alignment === self::HorizontalAlignRight) {
+			$x -= $width;
+		}
+
+		return $x;
+	}
+
+	/**
+	 * Determine the actual Y coordinate for text based on the alignment
+	 *
+	 * @param int $y
+	 * @param int $height
+	 * @param int $baseline
+	 * @param int $alignment
+	 * @return int
+	 */
+	private static function determineAlignmentPositionVertical($y, $height, $baseline, $alignment): int
+	{
+		if ($alignment === self::VerticalAlignMiddle) {
+			$y += round($baseline / 2);
+		} elseif ($alignment === self::VerticalAlignTop) {
+			$y += $baseline;
+		} else {
+			$y -= $height - $baseline;
+		}
+
+		return $y;
 	}
 }
