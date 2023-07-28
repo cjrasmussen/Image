@@ -107,7 +107,7 @@ class Resize
 	 * @param resource $src_image
 	 * @param bool $overflow
 	 */
-	public static function fitToImage(&$dst_image, &$src_image, bool $overflow = false)
+	public static function fitToImage(&$dst_image, &$src_image, bool $overflow = false): void
 	{
 		$src_w = imagesx($src_image);
 		$src_h = imagesy($src_image);
@@ -127,7 +127,7 @@ class Resize
 	 * @param string|int $gutter - Number of pixels or percentage of source dimensions
 	 * @return false|resource
 	 */
-	public static function addGutter($img, $gutter = '10%')
+	public static function addGutter($img, $gutter = '10%'): bool
 	{
 		$src_w = imagesx($img);
 		$src_h = imagesy($img);
