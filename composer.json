@@ -1,7 +1,7 @@
 {
   "name": "cjrasmussen/image",
   "description": "Simple functions for image manipulation",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "keywords": ["gd", "images"],
   "homepage": "https://cjr.dev",
   "license": "MIT",
@@ -17,10 +17,15 @@
     "source": "https://github.com/cjrasmussen/Image"
   },
   "require": {
-    "php": ">=7.1.0",
+    "php": ">=7.4.0",
     "ext-ctype": "*",
     "ext-gd": "*",
-    "cjrasmussen/color": "^1.1"
+    "cjrasmussen/color": "^1.1",
+    "ralouphie/mimey": "^2.1"
+  }
+  ,
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
   },
   "autoload": {
     "psr-4": {

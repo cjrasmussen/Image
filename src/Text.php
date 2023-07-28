@@ -1,4 +1,5 @@
 <?php
+
 namespace cjrasmussen\Image;
 
 use cjrasmussen\Color\Convert;
@@ -33,16 +34,16 @@ class Text
 	 */
 	public static function write(
 		&$img,
-		$text,
-		$font,
-		$size,
+		string $text,
+		string $font,
+		int $size,
 		$color,
-		$x,
-		$y,
-		$alignment_horizontal = self::HorizontalAlignLeft,
-		$alignment_vertical = self::VerticalAlignTop,
-		$max_width = null,
-		$stroke = 0,
+		int $x,
+		int $y,
+		int $alignment_horizontal = self::HorizontalAlignLeft,
+		int $alignment_vertical = self::VerticalAlignTop,
+		?int $max_width = null,
+		int $stroke = 0,
 		$strokeColor = null
 	): void
 	{
@@ -101,24 +102,24 @@ class Text
 	 */
 	public static function writeCondensed(
 		&$img,
-		$text,
-		$font,
-		$size,
+		string $text,
+		string $font,
+		int $size,
 		$color,
-		$condensed,
-		$x,
-		$y,
-		$alignment_horizontal = self::HorizontalAlignLeft,
-		$alignment_vertical = self::VerticalAlignTop
+		int $condensed,
+		int $x,
+		int $y,
+		int $alignment_horizontal = self::HorizontalAlignLeft,
+		int $alignment_vertical = self::VerticalAlignTop
 	): void
 	{
-		$box_size = Text::getBoxSize($text, $font, $size);
+		$box_size = self::getBoxSize($text, $font, $size);
 		$tmp_w = $box_size['width'] + 2;
 		$tmp_h = $box_size['height'] + 2;
 
 		$tmp = Create::transparent($tmp_w, $tmp_h);
 
-		Text::write($tmp, $text, $font, $size, $color, 1, 1);
+		self::write($tmp, $text, $font, $size, $color, 1, 1);
 
 		$dst_w = (int)floor($tmp_w * ($condensed / 100));
 
@@ -144,7 +145,7 @@ class Text
 	 * @param int $size
 	 * @return array
 	 */
-	public static function getBoxSize($text, $font, $size): array
+	public static function getBoxSize(string $text, string $font, int $size): array
 	{
 		$font_type = strrev(explode('.', strrev($font))[0]);
 
@@ -178,7 +179,7 @@ class Text
 	 *
 	 * @param resource $image
 	 * @param int $size
-	 * @param int $angle
+	 * @param float $angle
 	 * @param int $x
 	 * @param int $y
 	 * @param resource|int $textcolor
@@ -188,7 +189,7 @@ class Text
 	 * @param int $px
 	 * @see http://johnciacia.com/2010/01/04/using-php-and-gd-to-add-border-to-text/
 	 */
-	private static function ttfStroke(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px): void
+	private static function ttfStroke(&$image, int $size, float $angle, int $x, int $y, &$textcolor, &$strokecolor, string $fontfile, string $text, int $px): void
 	{
 
 		for ($c1 = ($x - abs($px)); $c1 <= ($x + abs($px)); $c1++) {
@@ -205,7 +206,7 @@ class Text
 	 *
 	 * @param resource $image
 	 * @param int $size
-	 * @param int $angle
+	 * @param float $angle
 	 * @param int $x
 	 * @param int $y
 	 * @param resource|int $textcolor
@@ -215,7 +216,7 @@ class Text
 	 * @param int $px
 	 * @see http://johnciacia.com/2010/01/04/using-php-and-gd-to-add-border-to-text/
 	 */
-	private static function ftStroke(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px): void
+	private static function ftStroke(&$image, int $size, float $angle, int $x, int $y, &$textcolor, &$strokecolor, string $fontfile, string $text, int $px): void
 	{
 
 		for ($c1 = ($x - abs($px)); $c1 <= ($x + abs($px)); $c1++) {
@@ -235,7 +236,7 @@ class Text
 	 * @param int $alignment
 	 * @return int
 	 */
-	private static function determineAlignmentPositionHorizontal($x, $width, $alignment): int
+	private static function determineAlignmentPositionHorizontal(int $x, int $width, int $alignment): int
 	{
 		if ($alignment === self::HorizontalAlignCenter) {
 			$x -= round($width / 2);
@@ -255,7 +256,7 @@ class Text
 	 * @param int $alignment
 	 * @return int
 	 */
-	private static function determineAlignmentPositionVertical($y, $height, $baseline, $alignment): int
+	private static function determineAlignmentPositionVertical(int $y, int $height, int $baseline, int $alignment): int
 	{
 		if ($alignment === self::VerticalAlignMiddle) {
 			$y += round($baseline / 2);

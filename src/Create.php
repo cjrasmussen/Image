@@ -11,7 +11,7 @@ class Create
 	 * @param int $height
 	 * @return false|\GdImage|resource
 	 */
-	public static function transparent($width, $height)
+	public static function transparent(int $width, int $height)
 	{
 		$img = imagecreatetruecolor($width, $height);
 		imagesavealpha($img, true);
