@@ -7,6 +7,10 @@ use Mimey\MimeTypes;
 
 class Resize
 {
+	public const BlueskyThumbWidth = 1000;
+	public const BlueskyThumbHeight = 1000;
+	public const BlueskyThumbMaxFileSize = 976560;
+
 	/**
 	 * Take an image file and return an image resource resized to the specified dimensions
 	 *
@@ -21,21 +25,7 @@ class Resize
 	 */
 	public static function resize(string $path, int $dst_w, int $dst_h, ?string $type = null, ?string $bg_hex = null, int $rounded = 0, $gutter = 0)
 	{
-		if (!$type) {
-			$extension = pathinfo($path, PATHINFO_EXTENSION);
-			if ($extension) {
-				$mimeTypes = new MimeTypes();
-				$type = $mimeTypes->getMimeType($extension);
-			}
-		}
-
-		if (in_array($type, ['image/jpg', 'image/jpeg'])) {
-			$src = imagecreatefromjpeg($path);
-		} elseif ($type === 'image/gif') {
-			$src = imagecreatefromgif($path);
-		} else {
-			$src = imagecreatefrompng($path);
-		}
+		$src = Create::imageResourceFromPath($path, $type);
 
 		if ($gutter) {
 			$src = self::addGutter($src, $gutter);
@@ -118,6 +108,39 @@ class Resize
 		$dims = self::calculateFitDimensions($src_w, $src_h, $dst_w, $dst_h, $overflow);
 
 		imagecopyresampled($dst_image, $src_image, (int)$dims['dst_x'], (int)$dims['dst_y'], (int)$dims['src_x'], (int)$dims['src_y'], (int)$dims['dst_w'], (int)$dims['dst_h'], (int)$dims['src_w'], (int)$dims['src_h']);
+	}
+
+	/**
+	 * @param string $path
+	 * @return object{contents: string, mimeType: string}
+	 */
+	public static function resizeForBlueskyThumbnail(string $path): object
+	{
+		$quality = 100;
+
+		$file = tempnam(sys_get_temp_dir(), 'bsky');
+		$src = Create::imageResourceFromPath($path);
+
+		$dst = imagecreatetruecolor(self::BlueskyThumbWidth, self::BlueskyThumbHeight);
+		self::fitToImage($dst, $src);
+
+		do {
+			imagejpeg($dst, $file, $quality);
+
+			$filesize = filesize($file);
+			$quality--;
+		} while ((!$filesize) || ($filesize > self::BlueskyThumbMaxFileSize));
+
+		$contents = file_get_contents($file);
+
+		imagedestroy($src);
+		imagedestroy($dst);
+		unlink($file);
+
+		return (object)[
+			'contents' => $contents,
+			'mimeType' => 'image/jpeg',
+		];
 	}
 
 	/**
