@@ -2,7 +2,7 @@
 
 namespace cjrasmussen\Image;
 
-use cjrasmussen\Color\Convert;
+use cjrasmussen\Color\ColorType\Hex;
 use cjrasmussen\Color\General;
 
 class Text
@@ -48,12 +48,12 @@ class Text
 	): void
 	{
 		if (General::isHexColor($color)) {
-			$rgb = Convert::hexToRgb($color);
+			$rgb = (new Hex($color))->toRgb();
 			$color = imagecolorallocate($img, $rgb->R, $rgb->G, $rgb->B);
 		}
 
 		if (($strokeColor !== null) AND (General::isHexColor($strokeColor))) {
-			$rgb = Convert::hexToRgb($strokeColor);
+			$rgb = (new Hex($strokeColor))->toRgb();
 			$strokeColor = imagecolorallocate($img, $rgb->R, $rgb->G, $rgb->B);
 		}
 

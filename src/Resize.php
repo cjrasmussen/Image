@@ -2,7 +2,7 @@
 
 namespace cjrasmussen\Image;
 
-use cjrasmussen\Color\Convert;
+use cjrasmussen\Color\ColorType\Hex;
 use Mimey\MimeTypes;
 
 class Resize
@@ -40,7 +40,7 @@ class Resize
 
 		if ($bg_hex) {
 			// ADD A DEFINED BACKGROUND COLOR
-			$color = Convert::hexToRgb($bg_hex);
+			$color = (new Hex($bg_hex))->toRgb();
 			$bg_color = imagecolorallocate($img, $color->R, $color->G, $color->B);
 
 			if ($rounded) {

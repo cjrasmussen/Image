@@ -1,7 +1,7 @@
 {
   "name": "cjrasmussen/image",
   "description": "Simple functions for image manipulation",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "keywords": ["gd", "images"],
   "homepage": "https://cjr.dev",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "php": ">=7.4.0",
     "ext-ctype": "*",
     "ext-gd": "*",
-    "cjrasmussen/color": "^1.1",
+    "cjrasmussen/color": "^2.0",
     "ralouphie/mimey": "^2.1"
   }
   ,
