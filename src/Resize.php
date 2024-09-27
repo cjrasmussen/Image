@@ -3,7 +3,6 @@
 namespace cjrasmussen\Image;
 
 use cjrasmussen\Color\ColorType\Hex;
-use Mimey\MimeTypes;
 
 class Resize
 {
@@ -150,7 +149,7 @@ class Resize
 	 * @param string|int $gutter - Number of pixels or percentage of source dimensions
 	 * @return false|resource
 	 */
-	public static function addGutter($img, $gutter = '10%'): bool
+	public static function addGutter($img, $gutter = '10%')
 	{
 		$src_w = imagesx($img);
 		$src_h = imagesy($img);
@@ -217,8 +216,8 @@ class Resize
 				$scale = 100;
 			}
 
-			$src_w = $use_width;
-			$src_h = $use_height;
+			$src_w = (int)$use_width;
+			$src_h = (int)$use_height;
 		} else {
 			if (($src_w / $src_h) > ($dst_w / $dst_h)) {
 				// TOO WIDE
@@ -242,8 +241,8 @@ class Resize
 				$scale = 100;
 			}
 
-			$dst_w = $use_width;
-			$dst_h = $use_height;
+			$dst_w = (int)$use_width;
+			$dst_h = (int)$use_height;
 		}
 
 		return [
