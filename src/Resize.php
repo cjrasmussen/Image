@@ -13,6 +13,8 @@ class Resize
 	/**
 	 * Take an image file and return an image resource resized to the specified dimensions
 	 *
+	 * To be decommissioned in v3.0.0
+	 *
 	 * @param string $path
 	 * @param int $dst_w
 	 * @param int $dst_h
@@ -92,6 +94,8 @@ class Resize
 	/**
 	 * Copy an image resource onto another image resource, resizing to fit the destination dimensions keeping source scale
 	 *
+	 * To be decommissioned in v3.0.0
+	 *
 	 * @param resource $dst_image
 	 * @param resource $src_image
 	 * @param bool $overflow
@@ -116,15 +120,17 @@ class Resize
 	public static function resizeForBlueskyThumbnail(string $path): object
 	{
 		$quality = 100;
+		$outputMimeType = 'image/jpeg';
 
 		$file = tempnam(sys_get_temp_dir(), 'bsky');
-		$src = Create::imageResourceFromPath($path);
 
-		$dst = imagecreatetruecolor(self::BlueskyThumbWidth, self::BlueskyThumbHeight);
-		self::fitToImage($dst, $src);
+		$src = new Image($path);
+		$dst = new Image(self::BlueskyThumbWidth, self::BlueskyThumbHeight);
+
+		$src->fitToImage($dst);
 
 		do {
-			imagejpeg($dst, $file, $quality);
+			$src->saveFile($file, $outputMimeType, $quality);
 
 			$filesize = filesize($file);
 			$quality--;
@@ -132,18 +138,18 @@ class Resize
 
 		$contents = file_get_contents($file);
 
-		imagedestroy($src);
-		imagedestroy($dst);
 		unlink($file);
 
 		return (object)[
 			'contents' => $contents,
-			'mimeType' => 'image/jpeg',
+			'mimeType' => $outputMimeType,
 		];
 	}
 
 	/**
 	 * Add a gutter to an image resource
+	 *
+	 * To be decommissioned in v3.0.0
 	 *
 	 * @param resource $img
 	 * @param string|int $gutter - Number of pixels or percentage of source dimensions

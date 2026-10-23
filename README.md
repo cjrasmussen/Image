@@ -1,6 +1,6 @@
 # Image
 
-Simple functions for image manipulation.
+Simple tooling for image manipulation, wrapping native GD functions.
 
 
 ## Usage

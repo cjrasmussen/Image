@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * To be decommissioned in v3.0.0
+ */
+
 namespace cjrasmussen\Image;
 
 class Transform

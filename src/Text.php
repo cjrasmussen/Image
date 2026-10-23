@@ -7,6 +7,9 @@ use cjrasmussen\Color\General;
 
 class Text
 {
+	/**
+	 * Consts to be decommissioned in v3.0.0
+	 */
 	public const VerticalAlignNone = 0;
 	public const VerticalAlignBottom = 1;
 	public const VerticalAlignMiddle = 2;
@@ -18,6 +21,8 @@ class Text
 
 	/**
 	 * Add a block of text to an image resource
+	 *
+	 * To be decommissioned in v3.0.0
 	 *
 	 * @param resource $img
 	 * @param string $text
@@ -87,6 +92,8 @@ class Text
 
 	/**
 	 * Add a block of text to an image resource, with the text horizontally condensed to a given percentage of the standard font size
+	 *
+	 * To be decommissioned in v3.0.0
 	 *
 	 * @param $img
 	 * @param string $text
@@ -177,6 +184,8 @@ class Text
 	/**
 	 * Writes the given text with a border into the image using TrueType fonts.
 	 *
+	 * To be decommissioned in v3.0.0
+	 *
 	 * @param resource $image
 	 * @param int $size
 	 * @param float $angle
@@ -203,6 +212,8 @@ class Text
 
 	/**
 	 * Writes the given text with a border into the image
+	 *
+	 * To be decommissioned in v3.0.0
 	 *
 	 * @param resource $image
 	 * @param int $size
@@ -231,6 +242,8 @@ class Text
 	/**
 	 * Determine the actual X coordinate for text based on the alignment
 	 *
+	 * To be decommissioned in v3.0.0
+	 *
 	 * @param int $x
 	 * @param int $width
 	 * @param int $alignment
@@ -249,6 +262,8 @@ class Text
 
 	/**
 	 * Determine the actual Y coordinate for text based on the alignment
+	 *
+	 * To be decommissioned in v3.0.0
 	 *
 	 * @param int $y
 	 * @param int $height
