@@ -23,7 +23,7 @@ class Image
 	private $image;
 
 	/**
-	 * @param string|int $primary - file path or image width
+	 * @param string|int|resource $primary - file path or image width
 	 * @param string|int|null $secondary - If file path provided as $primary, optional file type. If image width provided as $primary, image height.
 	 * @param bool|null $transparent - If width and height provided, flag for if the new image should be transparent
 	 */
@@ -35,6 +35,8 @@ class Image
 		} elseif ((is_int($primary)) && (is_int($secondary))) {
 			// CREATE NEW
 			$this->image = $this->createImageFromDimensions($primary, $secondary, $transparent);
+		} elseif (is_resource($primary)) {
+			$this->image = $primary;
 		} else {
 			// INVALID
 			throw new RuntimeException('Invalid image definition provided.');
