@@ -214,6 +214,8 @@ class Image
 
 		imagecopyresampled($dst, $this->image, $gutter_x, $gutter_y, 0, 0, $src_w, $src_h, $src_w, $src_h);
 
+		$this->resetImage($dst);
+
 		return $this;
 	}
 
@@ -1284,7 +1286,7 @@ class Image
 			imagecopyresampled($tmp, $this->image, $x, abs($y), $x, 0, 1, $src_h, 1, $src_h);
 		}
 
-		$this->image = $tmp;
+		$this->resetImage($tmp);
 
 		return $this;
 	}
@@ -1315,7 +1317,7 @@ class Image
 			}
 		}
 
-		$this->image = $tmp;
+		$this->resetImage($tmp);
 
 		return $this;
 	}
@@ -1370,6 +1372,22 @@ class Image
 		}
 
 		return null;
+	}
+
+	/**
+	 * Reset the image with new data
+	 *
+	 * @param $img
+	 * @return void
+	 */
+	private function resetImage($img): void
+	{
+		$width = imagesx($img);
+		$height = imagesy($img);
+
+		$this->image = $this->createImageFromDimensions($width, $height, true);
+
+		imagecopy($this->image, $img, 0, 0, 0, 0, $width, $height);
 	}
 
 	/**
