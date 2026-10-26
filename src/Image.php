@@ -167,17 +167,20 @@ class Image
 	 * @param bool $overflow
 	 * @return self
 	 */
-	public function fitToImage(self $src, bool $overflow = false): self
+	public function fitToImage(self $template, bool $overflow = false): self
 	{
-		$src_w = $src->getImageWidth();
-		$src_h = $src->getImageHeight();
+		$src_w = $this->getImageWidth();
+		$src_h = $this->getImageHeight();
 
-		$dst_w = $this->getImageWidth();
-		$dst_h = $this->getImageHeight();
+		$dst_w = $template->getImageWidth();
+		$dst_h = $template->getImageHeight();
 
 		$dims = Resize::calculateFitDimensions($src_w, $src_h, $dst_w, $dst_h, $overflow);
 
-		imagecopyresampled($this->image, $src->getImage(), (int)$dims['dst_x'], (int)$dims['dst_y'], (int)$dims['src_x'], (int)$dims['src_y'], (int)$dims['dst_w'], (int)$dims['dst_h'], (int)$dims['src_w'], (int)$dims['src_h']);
+		$template_img = $template->getImage();
+		imagecopyresampled($template_img, $this->image, (int)$dims['dst_x'], (int)$dims['dst_y'], (int)$dims['src_x'], (int)$dims['src_y'], (int)$dims['dst_w'], (int)$dims['dst_h'], (int)$dims['src_w'], (int)$dims['src_h']);
+
+		$this->resetImage($template_img);
 
 		return $this;
 	}
