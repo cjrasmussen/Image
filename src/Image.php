@@ -364,12 +364,11 @@ class Image
 	 * @param int $red
 	 * @param int $green
 	 * @param int $blue
-	 * @return self
+	 * @return false|int
 	 */
-	public function colorAllocate(int $red, int $green, int $blue): self
+	public function colorAllocate(int $red, int $green, int $blue)
 	{
-		imagecolorallocate($this->image, $red, $green, $blue) ;
-		return $this;
+		return imagecolorallocate($this->image, $red, $green, $blue) ;
 	}
 
 	/**
@@ -379,12 +378,11 @@ class Image
 	 * @param int $green
 	 * @param int $blue
 	 * @param int $alpha
-	 * @return self
+	 * @return false|int
 	 */
-	public function colorAllocateAlpha(int $red, int $green, int $blue, int $alpha): self
+	public function colorAllocateAlpha(int $red, int $green, int $blue, int $alpha)
 	{
-		imagecolorallocatealpha($this->image, $red, $green, $blue, $alpha) ;
-		return $this;
+		return imagecolorallocatealpha($this->image, $red, $green, $blue, $alpha) ;
 	}
 
 	/**
