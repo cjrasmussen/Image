@@ -582,6 +582,20 @@ class Image
 	}
 
 	/**
+	 * Flood fill.
+	 *
+	 * @param int $x
+	 * @param int $y
+	 * @param int $color
+	 * @return $this
+	 */
+	public function fill(int $x, int $y, int $color): self
+	{
+		imagefill($this->image, $x, $y, $color);
+		return $this;
+	}
+
+	/**
 	 * Draws a filled arc.
 	 *
 	 * @param int $centerX

@@ -1,7 +1,7 @@
 {
   "name": "cjrasmussen/image",
   "description": "Simple tooling for image manipulation, wrapping native GD functions",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "keywords": ["gd", "images"],
   "homepage": "https://cjr.dev",
   "license": "MIT",
