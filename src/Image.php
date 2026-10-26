@@ -203,6 +203,27 @@ class Image
 	}
 
 	/**
+	 * Square an image by the smaller of its dimensions
+	 *
+	 * @return self
+	 */
+	public function squareImage(): self
+	{
+		$src_w = $this->getImageWidth();
+		$src_h = $this->getImageHeight();
+
+		if ($src_w > $src_h) {
+			$src_w = $src_h;
+		} else {
+			$src_h = $src_w;
+		}
+
+		$img = new self($src_w, $src_h);
+
+		return $this->fitToImage($img, true);
+	}
+
+	/**
 	 * Add a gutter to the image
 	 *
 	 * @param string|int $gutter - Number of pixels or percentage of source dimensions
