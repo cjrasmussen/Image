@@ -1333,12 +1333,21 @@ class Image
 			}
 		}
 
+		$allow_transparency = false;
+
 		if (in_array($type, ['image/jpg', 'image/jpeg'])) {
 			$src = imagecreatefromjpeg($path);
 		} elseif ($type === 'image/gif') {
 			$src = imagecreatefromgif($path);
+			$allow_transparency = true;
 		} else {
 			$src = imagecreatefrompng($path);
+			$allow_transparency = true;
+		}
+
+		if ($allow_transparency) {
+			imagealphablending($src, false);
+			imagesavealpha($src, true);
 		}
 
 		if ($src) {
