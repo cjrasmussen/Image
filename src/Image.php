@@ -210,7 +210,7 @@ class Image
 		$dst_h = $src_h + ($gutter_y * 2);
 
 		$dst = imagecreatetruecolor($dst_w, $dst_h);
-		imagesavealpha($this->image, true);
+		imagesavealpha($dst, true);
 
 		$bg_color = imagecolorallocatealpha($dst, 0, 0, 0, 127);
 		imagefill($dst, 0, 0, $bg_color);
