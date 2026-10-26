@@ -1260,14 +1260,6 @@ class Image
 		return $this;
 	}
 
-
-
-
-
-
-
-
-
 	/**
 	 * Vertically arch the image
 	 *
