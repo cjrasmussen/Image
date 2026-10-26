@@ -19,6 +19,8 @@ class Image
 	public const TextAlignHorizontalCenter = 2;
 	public const TextAlignHorizontalRight = 3;
 
+	private ?string $originalMimeType = null;
+
 	/** @var resource|null $image  */
 	private $image;
 
@@ -65,6 +67,11 @@ class Image
 	public function getImageHeight(): int
 	{
 		return (int)imagesy($this->image);
+	}
+
+	public function getOriginalMimeType(): ?string
+	{
+		return $this->originalMimeType;
 	}
 
 	public function saveFile(string $path, ?string $type = null, int $quality = -1, int $filters = -1): bool
@@ -1348,6 +1355,8 @@ class Image
 				$type = $mimeTypes->getMimeType($extension);
 			}
 		}
+
+		$this->originalMimeType = $type;
 
 		$allow_transparency = false;
 
