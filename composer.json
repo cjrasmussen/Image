@@ -1,7 +1,7 @@
 {
   "name": "cjrasmussen/image",
   "description": "Simple tooling for image manipulation, wrapping native GD functions",
-  "version": "2.3.7",
+  "version": "3.0.0",
   "keywords": ["gd", "images"],
   "homepage": "https://cjr.dev",
   "license": "MIT",
@@ -17,11 +17,11 @@
     "source": "https://github.com/cjrasmussen/Image"
   },
   "require": {
-    "php": ">=7.4.0",
+    "php": ">=8.5.0",
     "ext-ctype": "*",
     "ext-gd": "*",
-    "cjrasmussen/color": "^2.0",
-    "ralouphie/mimey": "^2.1"
+    "cjrasmussen/color": "^3.0",
+    "elephox/mimey": "^4.0"
   }
   ,
   "require-dev": {

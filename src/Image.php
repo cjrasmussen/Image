@@ -4,32 +4,32 @@ namespace cjrasmussen\Image;
 
 use cjrasmussen\Color\ColorType\Hex;
 use cjrasmussen\Color\General;
-use Mimey\MimeTypes;
+use Elephox\Mimey\MimeTypes;
+use GdImage;
 use RuntimeException;
 use Throwable;
 
 class Image
 {
-	public const TextAlignVerticalNone = 0;
-	public const TextAlignVerticalBottom = 1;
-	public const TextAlignVerticalMiddle = 2;
-	public const TextAlignVerticalTop = 3;
-	public const TextAlignHorizontalNone = 0;
-	public const TextAlignHorizontalLeft = 1;
-	public const TextAlignHorizontalCenter = 2;
-	public const TextAlignHorizontalRight = 3;
+	public const int TextAlignVerticalNone = 0;
+	public const int TextAlignVerticalBottom = 1;
+	public const int TextAlignVerticalMiddle = 2;
+	public const int TextAlignVerticalTop = 3;
+	public const int TextAlignHorizontalNone = 0;
+	public const int TextAlignHorizontalLeft = 1;
+	public const int TextAlignHorizontalCenter = 2;
+	public const int TextAlignHorizontalRight = 3;
 
 	private ?string $originalMimeType = null;
 
-	/** @var resource|null $image  */
-	private $image;
+	private GdImage $image;
 
 	/**
-	 * @param string|int|resource $primary - file path or image width
-	 * @param string|int|null $secondary - If file path provided as $primary, optional file type. If image width provided as $primary, image height.
+	 * @param int|string|GdImage $primary - file path or image width
+	 * @param int|string|null $secondary - If file path provided as $primary, optional file type. If image width provided as $primary, image height.
 	 * @param bool|null $transparent - If width and height provided, flag for if the new image should be transparent
 	 */
-	public function __construct($primary, $secondary = null, ?bool $transparent = null)
+	public function __construct(int|string|GdImage $primary, int|string|null $secondary = null, ?bool $transparent = null)
 	{
 		if (is_string($primary) && !is_int($secondary)) {
 			// CREATE FROM FILE
@@ -38,7 +38,7 @@ class Image
 			// CREATE NEW
 			$transparent = is_bool($transparent) ? $transparent : true;
 			$this->image = $this->createImageFromDimensions($primary, $secondary, $transparent);
-		} elseif (is_resource($primary)) {
+		} elseif ($primary instanceof GdImage) {
 			$this->image = $primary;
 		} else {
 			// INVALID
@@ -50,12 +50,7 @@ class Image
 		}
 	}
 
-	public function __destruct()
-	{
-		@imagedestroy($this->image);
-	}
-
-	public function getImage()
+	public function getImage(): GdImage
 	{
 		return $this->image;
 	}
@@ -117,7 +112,7 @@ class Image
 	 * @param int|string $gutter
 	 * @return self
 	 */
-	public function resize(int $dst_w, int $dst_h, ?string $bg_hex = null, bool $rounded = false, $gutter = 0): self
+	public function resize(int $dst_w, int $dst_h, ?string $bg_hex = null, bool $rounded = false, int|string $gutter = 0): self
 	{
 		if ($gutter) {
 			$this->addGutter($gutter);
@@ -181,7 +176,7 @@ class Image
 	/**
 	 * Copy the image onto a destination image, using the destination dimensions and keeping source scale
 	 *
-	 * @param Image $src
+	 * @param self $template
 	 * @param bool $overflow
 	 * @return self
 	 */
@@ -213,11 +208,7 @@ class Image
 		$src_w = $this->getImageWidth();
 		$src_h = $this->getImageHeight();
 
-		if ($src_w > $src_h) {
-			$src_w = $src_h;
-		} else {
-			$src_h = $src_w;
-		}
+		$src_w = $src_h = min($src_w, $src_h);
 
 		$img = new self($src_w, $src_h);
 
@@ -227,15 +218,15 @@ class Image
 	/**
 	 * Add a gutter to the image
 	 *
-	 * @param string|int $gutter - Number of pixels or percentage of source dimensions
+	 * @param int|string $gutter - Number of pixels or percentage of source dimensions
 	 * @return self
 	 */
-	public function addGutter($gutter = '10%'): self
+	public function addGutter(int|string $gutter = '10%'): self
 	{
 		$src_w = imagesx($this->image);
 		$src_h = imagesy($this->image);
 
-		if ((is_string($gutter)) && (strpos($gutter, '%') !== false)) {
+		if ((is_string($gutter)) && (str_contains($gutter, '%'))) {
 			$gutter = (int)$gutter;
 			$gutter_x = round($src_w * ($gutter / 100));
 			$gutter_y = round($src_h * ($gutter / 100));
@@ -281,14 +272,14 @@ class Image
 		string $text,
 		string $font,
 		int $size,
-		$color,
+		int|string $color,
 		int $x,
 		int $y,
 		int $alignment_horizontal = self::TextAlignHorizontalLeft,
 		int $alignment_vertical = self::TextAlignVerticalTop,
 		?int $max_width = null,
 		int $stroke = 0,
-		$strokeColor = null
+		int|string|null $strokeColor = null
 	): self
 	{
 		if (General::isHexColor($color)) {
@@ -351,7 +342,7 @@ class Image
 		string $text,
 		string $font,
 		int $size,
-		$color,
+		int|string $color,
 		int $condensed,
 		int $x,
 		int $y,
@@ -365,7 +356,7 @@ class Image
 
 		try {
 			$tmp = new self($tmp_w, $tmp_h, true);
-		} catch (Throwable $e) {
+		} catch (Throwable) {
 			return $this;
 		}
 
@@ -395,9 +386,9 @@ class Image
 	 * @param int $blue
 	 * @return false|int
 	 */
-	public function colorAllocate(int $red, int $green, int $blue)
+	public function colorAllocate(int $red, int $green, int $blue): false|int
 	{
-		return imagecolorallocate($this->image, $red, $green, $blue) ;
+		return imagecolorallocate($this->image, $red, $green, $blue);
 	}
 
 	/**
@@ -409,9 +400,9 @@ class Image
 	 * @param int $alpha
 	 * @return false|int
 	 */
-	public function colorAllocateAlpha(int $red, int $green, int $blue, int $alpha)
+	public function colorAllocateAlpha(int $red, int $green, int $blue, int $alpha): false|int
 	{
-		return imagecolorallocatealpha($this->image, $red, $green, $blue, $alpha) ;
+		return imagecolorallocatealpha($this->image, $red, $green, $blue, $alpha);
 	}
 
 	/**
@@ -474,7 +465,7 @@ class Image
 	 */
 	public function colorDeallocate(int $color): self
 	{
-		imagecolordeallocate($this->image, $color) ;
+		imagecolordeallocate($this->image, $color);
 		return $this;
 	}
 
@@ -513,7 +504,7 @@ class Image
 	 */
 	public function colorMatch(self $image): self
 	{
-		imagecolormatch($this->image, $image->getImage()) ;
+		imagecolormatch($this->image, $image->getImage());
 		return $this;
 	}
 
@@ -556,7 +547,7 @@ class Image
 	 */
 	public function colorSet(int $color, int $red, int $green, int $blue, int $alpha = 0): self
 	{
-		imagecolorset($this->image, $color, $red, $green, $blue, $alpha) ;
+		imagecolorset($this->image, $color, $red, $green, $blue, $alpha);
 		return $this;
 	}
 
@@ -606,7 +597,7 @@ class Image
 	 */
 	public function arc(int $centerX, int $centerY, int $width, int $height, int $startAngle, int $endAngle, int $color): self
 	{
-		imagearc($this->image, $centerX, $centerY, $width, $height, $startAngle, $endAngle, $color) ;
+		imagearc($this->image, $centerX, $centerY, $width, $height, $startAngle, $endAngle, $color);
 		return $this;
 	}
 
@@ -639,7 +630,7 @@ class Image
 	 */
 	public function filledArc(int $centerX, int $centerY, int $width, int $height, int $startAngle, int $endAngle, int $color, int $style): self
 	{
-		imagefilledarc($this->image, $centerX, $centerY, $width, $height, $startAngle, $endAngle, $color, $style) ;
+		imagefilledarc($this->image, $centerX, $centerY, $width, $height, $startAngle, $endAngle, $color, $style);
 		return $this;
 	}
 
@@ -655,7 +646,7 @@ class Image
 	 */
 	public function ellipse(int $centerX, int $centerY, int $width, int $height, int $color): self
 	{
-		imageellipse($this->image, $centerX, $centerY, $width, $height, $color) ;
+		imageellipse($this->image, $centerX, $centerY, $width, $height, $color);
 		return $this;
 	}
 
@@ -671,7 +662,7 @@ class Image
 	 */
 	public function filledEllipse(int $centerX, int $centerY, int $width, int $height, int $color): self
 	{
-		imagefilledellipse($this->image, $centerX, $centerY, $width, $height, $color) ;
+		imagefilledellipse($this->image, $centerX, $centerY, $width, $height, $color);
 		return $this;
 	}
 
@@ -684,8 +675,7 @@ class Image
 	 */
 	public function filledPolygon(array $points, ?int $color = null): self
 	{
-		$num_points = count($points) / 2;
-		imagefilledpolygon($this->image, $points, $num_points, $color);
+		imagefilledpolygon($this->image, $points, $color);
 		return $this;
 	}
 
@@ -701,7 +691,7 @@ class Image
 	 */
 	public function char(int $font, int $x, int $y, string $char, int $color): self
 	{
-		imagechar($this->image, $font, $x, $y, $char, $color) ;
+		imagechar($this->image, $font, $x, $y, $char, $color);
 		return $this;
 	}
 
@@ -717,7 +707,7 @@ class Image
 	 */
 	public function charUp(int $font, int $x, int $y, string $char, int $color): self
 	{
-		imagecharup($this->image, $font, $x, $y, $char, $color) ;
+		imagecharup($this->image, $font, $x, $y, $char, $color);
 		return $this;
 	}
 
@@ -733,7 +723,7 @@ class Image
 	 */
 	public function line(int $x1, int $y1, int $x2, int $y2, int $color): self
 	{
-		imageline($this->image, $x1, $y1, $x2, $y2, $color) ;
+		imageline($this->image, $x1, $y1, $x2, $y2, $color);
 		return $this;
 	}
 
@@ -742,17 +732,11 @@ class Image
 	 *
 	 * @param array<int, int> $points Flattened points as [x1, y1, x2, y2, ...]
 	 * @param int $color
-	 * @param bool $filled
 	 * @return self
 	 */
-	public function polygon(array $points, int $color, bool $filled = false): self
+	public function polygon(array $points, int $color): self
 	{
-		if ($filled) {
-			imagefilledpolygon($this->image, $points, count($points) / 2, $color);
-		} else {
-			imagepolygon($this->image, $points, count($points) / 2, $color);
-		}
-
+		imagepolygon($this->image, $points, $color);
 		return $this;
 	}
 
@@ -768,7 +752,7 @@ class Image
 	 */
 	public function rectangle(int $x1, int $y1, int $x2, int $y2, int $color): self
 	{
-		imagerectangle($this->image, $x1, $y1, $x2, $y2, $color) ;
+		imagerectangle($this->image, $x1, $y1, $x2, $y2, $color);
 		return $this;
 	}
 
@@ -784,7 +768,7 @@ class Image
 	 */
 	public function filledRectangle(int $x1, int $y1, int $x2, int $y2, int $color): self
 	{
-		imagefilledrectangle($this->image, $x1, $y1, $x2, $y2, $color) ;
+		imagefilledrectangle($this->image, $x1, $y1, $x2, $y2, $color);
 		return $this;
 	}
 
@@ -798,7 +782,7 @@ class Image
 	 */
 	public function setPixel(int $x, int $y, int $color): self
 	{
-		imagesetpixel($this->image, $x, $y, $color) ;
+		imagesetpixel($this->image, $x, $y, $color);
 		return $this;
 	}
 
@@ -814,7 +798,7 @@ class Image
 	 */
 	public function string(int $font, int $x, int $y, string $text, int $color): self
 	{
-		imagestring($this->image, $font, $x, $y, $text, $color) ;
+		imagestring($this->image, $font, $x, $y, $text, $color);
 		return $this;
 	}
 
@@ -830,7 +814,7 @@ class Image
 	 */
 	public function stringUp(int $font, int $x, int $y, string $text, int $color): self
 	{
-		imagestringup($this->image, $font, $x, $y, $text, $color) ;
+		imagestringup($this->image, $font, $x, $y, $text, $color);
 		return $this;
 	}
 
@@ -862,7 +846,7 @@ class Image
 	 * @param string $font
 	 * @return int|false
 	 */
-	public function loadFont(string $font)
+	public function loadFont(string $font): false|int
 	{
 		return imageloadfont($font);
 	}
@@ -879,7 +863,7 @@ class Image
 	 * @param string $text
 	 * @return array{0:int,1:int,2:int,3:int,4:int,5:int,6:int}|false
 	 */
-	public function ttfText(float $size, float $angle, int $x, int $y, int $color, string $font_filename, string $text)
+	public function ttfText(float $size, float $angle, int $x, int $y, int $color, string $font_filename, string $text): false|array
 	{
 		return imagettftext($this->image, $size, $angle, $x, $y, $color, $font_filename, $text);
 	}
@@ -896,7 +880,7 @@ class Image
 	 * @param string $text
 	 * @return array{0:int,1:int,2:int,3:int,4:int,5:int,6:int}|false
 	 */
-	public function ftText(float $size, float $angle, int $x, int $y, int $color, string $font_filename, string $text)
+	public function ftText(float $size, float $angle, int $x, int $y, int $color, string $font_filename, string $text): false|array
 	{
 		return imagefttext($this->image, $size, $angle, $x, $y, $color, $font_filename, $text);
 	}
@@ -910,7 +894,7 @@ class Image
 	 * @param string $string
 	 * @return array{0:int,1:int,2:int,3:int,4:int,5:int,6:int}|false
 	 */
-	public function ttfBBox(float $size, float $angle, string $font_filename, string $string)
+	public function ttfBBox(float $size, float $angle, string $font_filename, string $string): false|array
 	{
 		return imagettfbbox($size, $angle, $font_filename, $string);
 	}
@@ -925,7 +909,7 @@ class Image
 	 * @param array $options
 	 * @return array{0:int,1:int,2:int,3:int,4:int,5:int,6:int}|false
 	 */
-	public function ftBBox(float $size, float $angle, string $font_filename, string $string, array $options = [])
+	public function ftBBox(float $size, float $angle, string $font_filename, string $string, array $options = []): false|array
 	{
 		return imageftbbox($size, $angle, $font_filename, $string, $options);
 	}
@@ -934,9 +918,9 @@ class Image
 	 * Affine transforms the image with a matrix.
 	 *
 	 * @param array<int, float> $matrix
-	 * @return resource|false
+	 * @return GdImage|false
 	 */
-	public function affine(array $matrix)
+	public function affine(array $matrix): GdImage|false
 	{
 		return imageaffine($this->image, $matrix);
 	}
@@ -947,7 +931,7 @@ class Image
 	 * @param array<int, array<int, float>> $matrix
 	 * @return array<int, float>|false
 	 */
-	public function affineMatrixConcat(array $matrix)
+	public function affineMatrixConcat(array $matrix): false|array
 	{
 		return imageaffinematrixconcat($matrix[0], $matrix[1]);
 	}
@@ -956,11 +940,12 @@ class Image
 	 * Gets an affine transformation matrix.
 	 *
 	 * @param int $type
+	 * @param mixed $options
 	 * @return array<int, float>|false
 	 */
-	public function affineMatrixGet(int $type)
+	public function affineMatrixGet(int $type, mixed $options): false|array
 	{
-		return imageaffinematrixget($type);
+		return imageaffinematrixget($type, $options);
 	}
 
 	/**
@@ -971,7 +956,7 @@ class Image
 	 */
 	public function alphaBlending(bool $enabled): self
 	{
-		imagealphablending($this->image, $enabled) ;
+		imagealphablending($this->image, $enabled);
 		return $this;
 	}
 
@@ -983,7 +968,7 @@ class Image
 	 */
 	public function antialias(bool $enabled): self
 	{
-		imageantialias($this->image, $enabled) ;
+		imageantialias($this->image, $enabled);
 		return $this;
 	}
 
@@ -1001,7 +986,7 @@ class Image
 	 */
 	public function copy(self $source, int $dstX, int $dstY, int $srcX, int $srcY, int $srcWidth, int $srcHeight): self
 	{
-		imagecopy($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight) ;
+		imagecopy($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight);
 		return $this;
 	}
 
@@ -1020,7 +1005,7 @@ class Image
 	 */
 	public function copyMerge(self $source, int $dstX, int $dstY, int $srcX, int $srcY, int $srcWidth, int $srcHeight, int $pct): self
 	{
-		imagecopymerge($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight, $pct) ;
+		imagecopymerge($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight, $pct);
 		return $this;
 	}
 
@@ -1039,7 +1024,7 @@ class Image
 	 */
 	public function copyMergeGray(self $source, int $dstX, int $dstY, int $srcX, int $srcY, int $srcWidth, int $srcHeight, int $pct): self
 	{
-		imagecopymergegray($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight, $pct) ;
+		imagecopymergegray($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $srcWidth, $srcHeight, $pct);
 		return $this;
 	}
 
@@ -1059,7 +1044,7 @@ class Image
 	 */
 	public function copyResized(self $source, int $dstX, int $dstY, int $srcX, int $srcY, int $dstWidth, int $dstHeight, int $srcWidth, int $srcHeight): self
 	{
-		imagecopyresized($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $dstWidth, $dstHeight, $srcWidth, $srcHeight) ;
+		imagecopyresized($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
 		return $this;
 	}
 
@@ -1079,7 +1064,7 @@ class Image
 	 */
 	public function copyResampled(self $source, int $dstX, int $dstY, int $srcX, int $srcY, int $dstWidth, int $dstHeight, int $srcWidth, int $srcHeight): self
 	{
-		imagecopyresampled($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $dstWidth, $dstHeight, $srcWidth, $srcHeight) ;
+		imagecopyresampled($this->image, $source->getImage(), $dstX, $dstY, $srcX, $srcY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
 		return $this;
 	}
 
@@ -1115,7 +1100,7 @@ class Image
 	 */
 	public function flip(int $mode): self
 	{
-		imageflip($this->image, $mode) ;
+		imageflip($this->image, $mode);
 		return $this;
 	}
 
@@ -1123,11 +1108,12 @@ class Image
 	 * Applies a GD filter.
 	 *
 	 * @param int $filterType
+	 * @param mixed ...$args
 	 * @return self
 	 */
 	public function filter(int $filterType, ...$args): self
 	{
-		imagefilter($this->image, $filterType, ...$args) ;
+		imagefilter($this->image, $filterType, ...$args);
 		return $this;
 	}
 
@@ -1140,7 +1126,7 @@ class Image
 	 */
 	public function gammaCorrect(float $inputGamma, float $outputGamma): self
 	{
-		imagegammacorrect($this->image, $inputGamma, $outputGamma) ;
+		imagegammacorrect($this->image, $inputGamma, $outputGamma);
 		return $this;
 	}
 
@@ -1152,7 +1138,7 @@ class Image
 	 */
 	public function interlace(bool $enabled): self
 	{
-		imageinterlace($this->image, $enabled ? 1 : 0) ;
+		imageinterlace($this->image, $enabled ? 1 : 0);
 		return $this;
 	}
 
@@ -1161,12 +1147,11 @@ class Image
 	 *
 	 * @param float $angle
 	 * @param int $bgColor
-	 * @param bool $ignoreTransparent
 	 * @return self
 	 */
-	public function rotate(float $angle, int $bgColor, bool $ignoreTransparent = false): self
+	public function rotate(float $angle, int $bgColor): self
 	{
-		imagerotate($this->image, $angle, $bgColor, $ignoreTransparent);
+		imagerotate($this->image, $angle, $bgColor);
 		return $this;
 	}
 
@@ -1193,7 +1178,7 @@ class Image
 	 */
 	public function trueColorToPalette(bool $dither, int $nColors): self
 	{
-		imagetruecolortopalette($this->image, $dither, $nColors) ;
+		imagetruecolortopalette($this->image, $dither, $nColors);
 		return $this;
 	}
 
@@ -1204,7 +1189,7 @@ class Image
 	 */
 	public function paletteToTrueColor(): self
 	{
-		imagepalettetotruecolor($this->image) ;
+		imagepalettetotruecolor($this->image);
 		return $this;
 	}
 
@@ -1218,7 +1203,7 @@ class Image
 	 */
 	public function convolution(array $matrix, float $divisor, float $offset): self
 	{
-		imageconvolution($this->image, $matrix, $divisor, $offset) ;
+		imageconvolution($this->image, $matrix, $divisor, $offset);
 		return $this;
 	}
 
@@ -1227,7 +1212,7 @@ class Image
 	 *
 	 * @return array{0:int,1:int,2:int,3:int}|false
 	 */
-	public function getClip(): array
+	public function getClip(): array|false
 	{
 		return imagegetclip($this->image);
 	}
@@ -1243,7 +1228,7 @@ class Image
 	 */
 	public function setClip(int $x, int $y, int $width, int $height): self
 	{
-		imagesetclip($this->image, $x, $y, $width, $height) ;
+		imagesetclip($this->image, $x, $y, $width, $height);
 		return $this;
 	}
 
@@ -1255,7 +1240,7 @@ class Image
 	 */
 	public function paletteCopy(self $source): self
 	{
-		imagepalettecopy($this->image, $source->getImage()) ;
+		imagepalettecopy($this->image, $source->getImage());
 		return $this;
 	}
 
@@ -1267,7 +1252,7 @@ class Image
 	 */
 	public function saveAlpha(bool $saveAlpha): self
 	{
-		imagesavealpha($this->image, $saveAlpha) ;
+		imagesavealpha($this->image, $saveAlpha);
 		return $this;
 	}
 
@@ -1279,7 +1264,7 @@ class Image
 	 */
 	public function setBrush(self $brush): self
 	{
-		imagesetbrush($this->image, $brush->getImage()) ;
+		imagesetbrush($this->image, $brush->getImage());
 		return $this;
 	}
 
@@ -1291,7 +1276,7 @@ class Image
 	 */
 	public function setTile(self $tile): self
 	{
-		imagesettile($this->image, $tile->getImage()) ;
+		imagesettile($this->image, $tile->getImage());
 		return $this;
 	}
 
@@ -1303,7 +1288,7 @@ class Image
 	 */
 	public function setStyle(array $style): self
 	{
-		imagesetstyle($this->image, $style) ;
+		imagesetstyle($this->image, $style);
 		return $this;
 	}
 
@@ -1315,7 +1300,7 @@ class Image
 	 */
 	public function setThickness(int $thickness): self
 	{
-		imagesetthickness($this->image, $thickness) ;
+		imagesetthickness($this->image, $thickness);
 		return $this;
 	}
 
@@ -1381,8 +1366,9 @@ class Image
 	 *
 	 * @param string $path
 	 * @param string|null $type
+	 * @return GdImage|null
 	 */
-	private function createImageFromPath(string $path, ?string $type = null)
+	private function createImageFromPath(string $path, ?string $type = null): ?GdImage
 	{
 		if (!$type) {
 			$extension = pathinfo($path, PATHINFO_EXTENSION);
@@ -1422,8 +1408,9 @@ class Image
 	 * @param int $width
 	 * @param int $height
 	 * @param bool $transparent
+	 * @return GdImage|null
 	 */
-	private function createImageFromDimensions(int $width, int $height, bool $transparent = false)
+	private function createImageFromDimensions(int $width, int $height, bool $transparent = false): ?GdImage
 	{
 		$img = imagecreatetruecolor($width, $height);
 
@@ -1442,10 +1429,10 @@ class Image
 	/**
 	 * Reset the image with new data
 	 *
-	 * @param $img
+	 * @param GdImage $img
 	 * @return void
 	 */
-	private function resetImage($img): void
+	private function resetImage(GdImage $img): void
 	{
 		$width = imagesx($img);
 		$height = imagesy($img);
@@ -1459,11 +1446,11 @@ class Image
 	 * Calculate the height of an arch based on its x-coordinate, width, and magnitude
 	 *
 	 * @param int $x
-	 * @param int|float $magnitude
-	 * @param int|float $width
+	 * @param float|int $magnitude
+	 * @param float|int $width
 	 * @return int|float
 	 */
-	private static function calculateArchHeight(int $x, $magnitude, $width)
+	private static function calculateArchHeight(int $x, float|int $magnitude, float|int $width): float|int
 	{
 		return (-1 * (($magnitude / 100) / ($width * .8)) * (($x - ($width / 2)) ** 2));
 	}

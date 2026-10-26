@@ -2,116 +2,11 @@
 
 namespace cjrasmussen\Image;
 
-use cjrasmussen\Color\ColorType\Hex;
-
 class Resize
 {
-	public const BlueskyThumbWidth = 1000;
-	public const BlueskyThumbHeight = 1000;
-	public const BlueskyThumbMaxFileSize = 976560;
-
-	/**
-	 * Take an image file and return an image resource resized to the specified dimensions
-	 *
-	 * To be decommissioned in v3.0.0
-	 *
-	 * @param string $path
-	 * @param int $dst_w
-	 * @param int $dst_h
-	 * @param string|null $type
-	 * @param string|null $bg_hex
-	 * @param int $rounded
-	 * @param int|string $gutter
-	 * @return resource
-	 */
-	public static function resize(string $path, int $dst_w, int $dst_h, ?string $type = null, ?string $bg_hex = null, int $rounded = 0, $gutter = 0)
-	{
-		$src = Create::imageResourceFromPath($path, $type);
-
-		if ($gutter) {
-			$src = self::addGutter($src, $gutter);
-		}
-
-		$img = imagecreatetruecolor($dst_w, $dst_h);
-		imagesavealpha($img, true);
-
-		// START WITH TRANSPARENT BACKGROUND
-		$bg_color = imagecolorallocatealpha($img, 0, 0, 0, 127);
-		imagefill($img, 0, 0, $bg_color);
-
-		if ($bg_hex) {
-			// ADD A DEFINED BACKGROUND COLOR
-			$color = (new Hex($bg_hex))->toRgb();
-			$bg_color = imagecolorallocate($img, $color->R, $color->G, $color->B);
-
-			if ($rounded) {
-				$bg_w = $dst_w * 10;
-				$bg_h = $dst_h * 10;
-
-				// MAKE BACKGROUND IMAGE
-				$bg_img = imagecreatetruecolor($bg_w, $bg_h);
-				imagesavealpha($bg_img, true);
-
-				$trans = imagecolorallocatealpha($bg_img, 0, 0, 0, 127);
-				imagefill($bg_img, 0, 0, $trans);
-
-				// MAKE A ROUNDED SHAPE TO FILL
-				$diameter = round((($bg_w > $bg_h) ? $bg_w : $bg_h) * .26);
-				$radius = round($diameter / 2);
-
-				// FOUR CORNERS
-				imagearc($bg_img, $radius, $radius, $diameter, $diameter, 180, 270, $bg_color);
-				imagearc($bg_img, ($bg_w - $radius), $radius, $diameter, $diameter, 270, 0, $bg_color);
-				imagearc($bg_img, ($bg_w - $radius), ($bg_h - $radius), $diameter, $diameter, 0, 90, $bg_color);
-				imagearc($bg_img, $radius, ($bg_h - $radius), $diameter, $diameter, 90, 180, $bg_color);
-
-				// FOUR LINES
-				imageline($bg_img, 0, $radius, 0, ($bg_w - $radius), $bg_color);
-				imageline($bg_img, $radius, 0, ($bg_h - $radius), 0, $bg_color);
-				imageline($bg_img, ($bg_h - 1), $radius, ($bg_h - 1), ($bg_w - $radius), $bg_color);
-				imageline($bg_img, $radius, ($bg_w - 1), ($bg_h - $radius), ($bg_w - 1), $bg_color);
-
-				// FILL THE ENTIRE SPACE FROM THE MIDDLE
-				imagefill($bg_img, round($bg_w / 2), round($bg_h / 2), $bg_color);
-
-				// COPY BACKGROUND TO IMAGE
-				imagecopyresampled($img, $bg_img, 0, 0, 0, 0, $dst_w, $dst_h, $bg_w, $bg_h);
-
-				imagedestroy($bg_img);
-			} else {
-				// FILL THE ENTIRE SPACE
-				imagefill($img, 0, 0, $bg_color);
-			}
-		}
-
-		self::fitToImage($img, $src);
-
-		imagedestroy($src);
-
-		return $img;
-	}
-
-	/**
-	 * Copy an image resource onto another image resource, resizing to fit the destination dimensions keeping source scale
-	 *
-	 * To be decommissioned in v3.0.0
-	 *
-	 * @param resource $dst_image
-	 * @param resource $src_image
-	 * @param bool $overflow
-	 */
-	public static function fitToImage(&$dst_image, &$src_image, bool $overflow = false): void
-	{
-		$src_w = imagesx($src_image);
-		$src_h = imagesy($src_image);
-
-		$dst_w = imagesx($dst_image);
-		$dst_h = imagesy($dst_image);
-
-		$dims = self::calculateFitDimensions($src_w, $src_h, $dst_w, $dst_h, $overflow);
-
-		imagecopyresampled($dst_image, $src_image, (int)$dims['dst_x'], (int)$dims['dst_y'], (int)$dims['src_x'], (int)$dims['src_y'], (int)$dims['dst_w'], (int)$dims['dst_h'], (int)$dims['src_w'], (int)$dims['src_h']);
-	}
+	public const int BlueskyThumbWidth = 1000;
+	public const int BlueskyThumbHeight = 1000;
+	public const int BlueskyThumbMaxFileSize = 976560;
 
 	/**
 	 * @param string $path
@@ -144,45 +39,6 @@ class Resize
 			'contents' => $contents,
 			'mimeType' => $outputMimeType,
 		];
-	}
-
-	/**
-	 * Add a gutter to an image resource
-	 *
-	 * To be decommissioned in v3.0.0
-	 *
-	 * @param resource $img
-	 * @param string|int $gutter - Number of pixels or percentage of source dimensions
-	 * @return false|resource
-	 */
-	public static function addGutter($img, $gutter = '10%')
-	{
-		$src_w = imagesx($img);
-		$src_h = imagesy($img);
-
-		if (false !== strpos($gutter, '%')) {
-			$gutter = (int)$gutter;
-			$gutter_x = round($src_w * ($gutter / 100));
-			$gutter_y = round($src_h * ($gutter / 100));
-		} else {
-			$gutter = (int)$gutter;
-			$gutter_x = $src_w + $gutter;
-			$gutter_y = $src_h + $gutter;
-		}
-
-		$dst_w = $src_w + ($gutter_x * 2);
-		$dst_h = $src_h + ($gutter_y * 2);
-
-		$dst = imagecreatetruecolor($dst_w, $dst_h);
-		imagesavealpha($img, true);
-
-		$bg_color = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-		imagefill($dst, 0, 0, $bg_color);
-
-		imagecopyresampled($dst, $img, $gutter_x, $gutter_y, 0, 0, $src_w, $src_h, $src_w, $src_h);
-
-		imagedestroy($img);
-		return $dst;
 	}
 
 	/**
