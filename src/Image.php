@@ -41,6 +41,10 @@ class Image
 			// INVALID
 			throw new RuntimeException('Invalid image definition provided.');
 		}
+
+		if (!$this->image) {
+			throw new RuntimeException('Image could not be created.');
+		}
 	}
 
 	public function __destruct()
