@@ -88,6 +88,16 @@ class Image
 		return imagepng($this->image, $path, $quality, $filters);
 	}
 
+	public function outputFile(string $type, int $quality = -1, int $filters = -1): void
+	{
+		if (in_array($type, ['image/jpg', 'image/jpeg'])) {
+			imagejpeg($this->image, null, $quality);
+		} elseif ($type === 'image/gif') {
+			imagegif($this->image);
+		} else {
+			imagepng($this->image, null, $quality, $filters);
+		}
+	}
 
 	/**
 	 * Resize the image to the specified dimensions
