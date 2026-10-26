@@ -36,6 +36,7 @@ class Image
 			$this->image = $this->createImageFromPath($primary, $secondary);
 		} elseif ((is_int($primary)) && (is_int($secondary))) {
 			// CREATE NEW
+			$transparent = is_bool($transparent) ? $transparent : true;
 			$this->image = $this->createImageFromDimensions($primary, $secondary, $transparent);
 		} elseif (is_resource($primary)) {
 			$this->image = $primary;
