@@ -676,6 +676,20 @@ class Image
 	}
 
 	/**
+	 * Draw a filled polygon
+	 *
+	 * @param array $points
+	 * @param int|null $color
+	 * @return $this
+	 */
+	public function filledPolygon(array $points, ?int $color = null): self
+	{
+		$num_points = count($points) / 2;
+		imagefilledpolygon($this->image, $points, $num_points, $color);
+		return $this;
+	}
+
+	/**
 	 * Draws a single character.
 	 *
 	 * @param int $font
