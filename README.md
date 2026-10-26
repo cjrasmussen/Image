@@ -6,12 +6,16 @@ Simple tooling for image manipulation, wrapping native GD functions.
 ## Usage
 
 ```php
-use cjrasmussen\Image\Resize;
-use cjrasmussen\Image\Text;
+use cjrasmussen\Image\Image;
 
-Resize::fitToImage($dst, $src);
+$img = new Image(1000, 500);
+$img->saveAlpha(true);
 
-Text::write($dst, 'Hello World', 'MyFont.ttf', 32, '880000'. 20, 20);
+$img->writeText('MyFont.ttf', 32, '880000', 20, 20)
+
+$img->resize(500, 250);
+
+$img->saveFile('/path/to/file.png', 'image/png');
 ```
 
 ## Installation
