@@ -358,12 +358,6 @@ class Image
 		return $this;
 	}
 
-
-
-
-
-
-
 	/**
 	 * Allocates a color in the image palette.
 	 *
